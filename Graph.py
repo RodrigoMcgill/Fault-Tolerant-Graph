@@ -26,7 +26,7 @@ def draw_graph(G):
 
 #Obtain all simple paths between source node and target node
 def modify_djikstra(G, source, target):
-      paths =list(nx.all_simple_paths(G, source="U", target="Z"))
+      paths =list(nx.all_simple_paths(G, source=source, target=target))
       reliabilities = []
       for p in paths:
           tolRel=1
