@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import operator
 import os
+import time
 import pandas as pd
 
 G = nx.Graph()
@@ -14,18 +15,26 @@ def draw_node(G, node, x, y):
 
 # Draw a edge given the |Graph 'G'|source node|target node|reliability|
 def draw_edge(G, source, target, r):
-    G.add_edge(source, target, r=r)
+    G.add_edge(source, target,r=r)
 
 
 # Automatically draws and plots the graph G
 def draw_graph(G):
     pos = nx.get_node_attributes(G, 'position')
-    nx.draw(G, pos, node_size=2000, node_color='black')
+    edges = G.edges()
+    colors = [G[u][v]['color'] for u, v in edges]
+    nx.draw(G, pos, node_size=2000, node_color='black',edges=edges, edge_color=colors)
     node_labels = nx.get_node_attributes(G, 'id')
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_color='w')
-    edge_labels = nx.get_edge_attributes(G,'id')
-    nx.draw_networkx_edge_labels(G, pos, labels=edge_labels)
+    labels = nx.get_edge_attributes(G, 'r')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     plt.show()
+    clear()
+    print('Graph has been plotted... /n')
+
+#changing the reliability of an edge
+def change_rel(source,target,new_weight):
+    G[source][target]['r'] = new_weight
 
 
 # Obtain all simple paths between source node and target node
@@ -51,7 +60,7 @@ def modify_djikstra(G, source, target):
 
 
 def clear():
-    cls = '\n' * 5
+    cls = '\n' * 10
     print(cls)
 
 
@@ -77,6 +86,9 @@ def Djikstra_arguments():
             source, target, r = input("Which nodes you want to connect and what's the reliability [Source] [Target] [Reliability] \n").split(' ')
             draw_edge(G, source, target, r)
             done = input("continue?: [yes] [no] \n")
+            if done != 'no':
+                if done != 'yes':
+                    done = 'yes'
             clear()
         except:
             print('Oops, an error occurred, please try again \n')
