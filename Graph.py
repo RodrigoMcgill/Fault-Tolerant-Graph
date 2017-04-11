@@ -7,12 +7,14 @@ import time
 import pandas as pd
 import _thread
 import warnings
+import random
+
 
 warnings.filterwarnings("ignore")
 G = nx.Graph()
 
 def clear():
-    cls = '\n' * 1
+    cls = '\n' * 3
     print(cls)
 
 # Draw a node given the |Graph 'G'|node|position|
@@ -37,7 +39,7 @@ def draw_graph(G):
     labels = nx.get_edge_attributes(G, 'r')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     plt.show()
-    clear()
+
 
 #changing the reliability of an edge
 def change_rel(source,target,new_weight):
@@ -74,7 +76,6 @@ def Djikstra_arguments():
             if done != 'no':
                 if done != 'yes':
                     done = 'yes'
-            clear()
         except:
             print('Oops, an error occurred, please try again \n')
     done = 'yes'
@@ -88,7 +89,6 @@ def Djikstra_arguments():
             if done != 'no':
                 if done != 'yes':
                     done = 'yes'
-            clear()
         except:
             print('Oops, an error occurred, please try again \n')
     print('Here is your customized graph...')
@@ -103,18 +103,104 @@ def Fault_Tolerant_G(G):
     while True:
         try:
             source, target = input('choose two nodes for message transmission [target] [source] \n').split(' ')
-            path_sorted, reliabilities_sorted = modify_djikstra(G, source, target)
+            paths_sorted, reliabilities_sorted = modify_djikstra(G, source, target)
             break
         except Exception as e:
             print(e)
 
-    first_list = path_sorted[0]
-    print('path_sorted[0]: ' + str(first_list))
+    first_list = paths_sorted[0]
     for i in range(len(first_list) - 1):  # changes the width color and size to green
-        G[first_list[i]][first_list[i + 1]]['color'] = 'g'
-        G[first_list[i]][first_list[i + 1]]['width'] = 6
+        G[first_list[i]][first_list[i + 1]]['color'] = 'w'
+        G[first_list[i]][first_list[i + 1]]['width'] = 9
     plt.title('Rel =' + str(reliabilities_sorted[0]))
     draw_graph(G)
+
+    sending_message(G,paths_sorted,reliabilities_sorted)
+
+
+ #sending message
+def sending_message(G,paths_sorted,reliabilities_sorted):
+    current_path = paths_sorted[0]
+    print('message will be forwarded through the path given \n')
+
+    for i in range(len(current_path)-1):
+        tries = 3
+        while tries > 0:
+            S = current_path[i]
+            T = current_path[i+1]
+            print('Attempts remaining  :' + str(tries) + '\n')
+            prob = random_num(G[S][T]['r'])
+            result = mess_animation(S,T,prob)
+            if result == True:
+                print('message reached node ' + T + '\n')
+                break
+            else:
+                print('WARNING! message has failed to reach its destination. Error happened between node ' + S + '--' +  'T \n')
+                time.sleep(2)
+                tries = tries -1
+
+    print('doneeeeeeeee')
+
+
+
+
+#returns  TRUE or FALSE , the message did went through or did not
+def random_num(edge_rel):
+    return random.random() < float(edge_rel)
+
+def mess_animation(source,target,condition):
+    print(str(source)+  'm.................'+str(target)+'\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.m................' + str(target)+'\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '..m...............' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '...m..............' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.....m............' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '......m...........' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.......m..........' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '........m.........' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.........m........' + str(target) + '\n')
+    clear()
+    if condition == False:
+        return False
+    print(str(source) + '..........m.......' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '...........m......' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '............m.....' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.............m....' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '..............m...' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '...............m..' + str(target) + '\n')
+    time.sleep(0.25)
+    print(str(source) + '................m.' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    print(str(source) + '.................m' + str(target) + '\n')
+    time.sleep(0.25)
+    clear()
+    return True
 
 
 
@@ -159,20 +245,4 @@ def main():
 
 main()
 
-
-
-import matplotlib.pyplot as plt
-import networkx as nx
-import operator
-import os
-import time
-import pandas as pd
-import _thread
-import warnings
-class sending_message:
-
-    def __init__(self,G,path_sorted,reliabilities_sorted):
-        self.G = G
-        self.path_sorted = path_sorted
-        self.reliabilities_sorted = reliabilities_sorted
 
