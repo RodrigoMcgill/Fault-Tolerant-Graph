@@ -218,10 +218,10 @@ def prim_optimization(inp, mode):
     for index, row in inp.iterrows():
         nameA = row['First Edge']
         nameB = row['Second Edge']
-        G.add_node(nameA, id=nameA)
-        G.add_node(nameB, id=nameB)
+        draw_node(G,nameA,random.random(), random.random())
+        draw_node(G,nameB, random.random(), random.random())
         if not nx.has_path(G, nameA, nameB):
-            G.add_edge(nameA, nameB, r=row['Reliability'])
+            draw_edge(G,nameA, nameB, row['Reliability'],'k',2)
 
 
 def prim_arguments():
@@ -229,7 +229,7 @@ def prim_arguments():
         "Copy the Path of the excel file you would like to use, and the optimization parameter [Path] [Cost or Reliability]\n").split(
         ' ')
     prim_optimization(inp, mode)
-    nx.draw_networkx(G)
+    draw_graph(G)
     plt.show()
 
 # main method
