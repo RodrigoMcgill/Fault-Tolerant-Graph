@@ -1,12 +1,19 @@
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import operator
 import os
 import time
 import pandas as pd
+import _thread
+import warnings
 
+warnings.filterwarnings("ignore")
 G = nx.Graph()
 
+def clear():
+    cls = '\n' * 1
+    print(cls)
 
 # Draw a node given the |Graph 'G'|node|position|
 def draw_node(G, node, x, y):
@@ -14,8 +21,9 @@ def draw_node(G, node, x, y):
 
 
 # Draw a edge given the |Graph 'G'|source node|target node|reliability|
-def draw_edge(G, source, target, r):
-    G.add_edge(source, target,r=r)
+def draw_edge(G, source, target, r, color,width):
+    G.add_edge(source, target,r=r, color=color,width=width)
+
 
 
 # Automatically draws and plots the graph G
@@ -23,14 +31,13 @@ def draw_graph(G):
     pos = nx.get_node_attributes(G, 'position')
     edges = G.edges()
     colors = [G[u][v]['color'] for u, v in edges]
-    nx.draw(G, pos, node_size=2000, node_color='black',edges=edges, edge_color=colors)
+    nx.draw(G, pos, node_size=2000, node_color='black', edges=edges, edge_color=colors)
     node_labels = nx.get_node_attributes(G, 'id')
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_color='w')
     labels = nx.get_edge_attributes(G, 'r')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     plt.show()
     clear()
-    print('Graph has been plotted... /n')
 
 #changing the reliability of an edge
 def change_rel(source,target,new_weight):
@@ -44,25 +51,17 @@ def modify_djikstra(G, source, target):
     for p in paths:
         tolRel = 1
         for i in range(len(p) - 1):
-            tolRel = tolRel * G[p[i]][p[i + 1]]['r']
+            tolRel = tolRel * float(G[p[i]][p[i + 1]]['r'])
         reliabilities.append(tolRel)
     path_sorted = []
     reliabilities_sorted = []
     for i in range(len(reliabilities)):
         index, value = max(enumerate(reliabilities), key=operator.itemgetter(1))
-        print("index: " + str(index) + " value" + str(value))
-        print(paths[index])
         path_sorted.append(paths[index])
         reliabilities_sorted.append(value)
         del paths[index]
         del reliabilities[index]
     return path_sorted, reliabilities_sorted
-
-
-def clear():
-    cls = '\n' * 10
-    print(cls)
-
 
 # Create nodes and edges
 def Djikstra_arguments():
@@ -84,7 +83,7 @@ def Djikstra_arguments():
             print("This is a list of all nodes")
             print(G.nodes(data=False))
             source, target, r = input("Which nodes you want to connect and what's the reliability [Source] [Target] [Reliability] \n").split(' ')
-            draw_edge(G, source, target, r)
+            draw_edge(G, source, target, r,'k',2)
             done = input("continue?: [yes] [no] \n")
             if done != 'no':
                 if done != 'yes':
@@ -92,7 +91,34 @@ def Djikstra_arguments():
             clear()
         except:
             print('Oops, an error occurred, please try again \n')
+    print('Here is your customized graph...')
+    time.sleep(1)
+    draw_graph(G)
+    time.sleep(1)
+    Fault_Tolerant_G(G)
 
+
+def Fault_Tolerant_G(G):
+
+    while True:
+        try:
+            source, target = input('choose two nodes for message transmission [target] [source] \n').split(' ')
+            path_sorted, reliabilities_sorted = modify_djikstra(G, source, target)
+            break
+        except Exception as e:
+            print(e)
+
+    first_list = path_sorted[0]
+    print('path_sorted[0]: ' + str(first_list))
+    for i in range(len(first_list) - 1):  # changes the width color and size to green
+        G[first_list[i]][first_list[i + 1]]['color'] = 'g'
+        G[first_list[i]][first_list[i + 1]]['width'] = 6
+    plt.title('Rel =' + str(reliabilities_sorted[0]))
+    draw_graph(G)
+
+
+
+#######...............................
 
 def prim_optimization(inp, mode):
     inp = pd.read_excel('Input.xlsx')
@@ -103,11 +129,9 @@ def prim_optimization(inp, mode):
     else:
         inp.sort_values('Reliability', ascending=False, inplace=True)
         print(inp)
-
     for index, row in inp.iterrows():
         nameA = row['First Edge']
         nameB = row['Second Edge']
-
         G.add_node(nameA, id=nameA)
         G.add_node(nameB, id=nameB)
         if not nx.has_path(G, nameA, nameB):
@@ -119,11 +143,10 @@ def prim_arguments():
         "Copy the Path of the excel file you would like to use, and the optimization parameter [Path] [Cost or Reliability]\n").split(
         ' ')
     prim_optimization(inp, mode)
-
     nx.draw_networkx(G)
     plt.show()
 
-
+# main method
 def main():
     while True:
         select = input("Select mode of Operation [Prim or Djikstra] \n")
@@ -131,15 +154,25 @@ def main():
             prim_arguments()
         elif select == "Djikstra":
             Djikstra_arguments()
-            draw_graph(G)
         else:
             print('Oops, there was an error in the input, please write correctly the method \n')
 
-
 main()
 
-"""
-x,y= input("fff \n").split(' ')
-path_sorted,reliabilities_sorted = modify_djikstra(G,'U','Z')
-print("path sorted \n:" + str(path_sorted)+ "\n reliabilities sorted" + str(reliabilities_sorted))
-"""
+
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import operator
+import os
+import time
+import pandas as pd
+import _thread
+import warnings
+class sending_message:
+
+    def __init__(self,G,path_sorted,reliabilities_sorted):
+        self.G = G
+        self.path_sorted = path_sorted
+        self.reliabilities_sorted = reliabilities_sorted
+
