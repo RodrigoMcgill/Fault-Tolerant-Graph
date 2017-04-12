@@ -38,7 +38,7 @@ def revert_graph(paths_sorted,reliabilities_sorted):
     first_list = paths_sorted
     for i in range(len(first_list) - 1):  # changes the width color and size to green
         G[first_list[i]][first_list[i + 1]]['color'] = 'k'
-        G[first_list[i]][first_list[i + 1]]['width'] = 3
+        G[first_list[i]][first_list[i + 1]]['width'] = 1
 
 
 # Automatically draws and plots the graph G
@@ -84,7 +84,7 @@ def Djikstra_arguments():
     done = 'yes'
     while done == 'yes':
         try:
-            name, x, y = input("Create a node [name of node] [position x] [position y] \n").split(' ')
+            name, x, y = input("Create a node [name of node] [position x] [position y] or type [exit] to finish \n").split(' ')
             draw_node(G, name, int(x), int(y))
             done = input("continue?: [yes] [no] \n")
             if done != 'no':
@@ -98,7 +98,7 @@ def Djikstra_arguments():
             print("This is a list of all nodes")
             print(G.nodes(data=False))
             source, target, r = input("Which nodes you want to connect and what's the reliability [Source] [Target] [Reliability] \n").split(' ')
-            draw_edge(G, source, target, r,'k',3)
+            draw_edge(G, source, target, r,'k',1)
             done = input("continue?: [yes] [no] \n")
             if done != 'no':
                 if done != 'yes':
@@ -125,7 +125,7 @@ def Fault_Tolerant_G(G):
     time.sleep(5)
     success =True
     for i in range(len(paths_sorted)):
-        print('message will be forwarded through given the path \n')
+        print('message will be forwarded through the most reliable path \n')
         time.sleep(3)
         draw_best_path_g(paths_sorted[i], reliabilities_sorted[i])
         clear()
@@ -167,17 +167,17 @@ def sending_message(G,paths_sorted,reliabilities_sorted):
     success = True
     while tries > 0:
         clear()
-        print('Attempts remaining  :' + str(tries) + '\n')
-        time.sleep(3)
+        print('          Attempts remaining  :' + str(tries) + '\n')
+        time.sleep(2)
         for i in range(len(current_path)-1):
             S = current_path[i]
             T = current_path[i+1]
             prob = random_num(G[S][T]['r'])
             result = mess_animation(S,T,prob)
             if result == True:
-                print('message reached node ' + T + '\n')
+                print('          message reached node "' + T +'"\n')
                 success = True
-                time.sleep(3)
+                time.sleep(2)
             else:
                 print('WARNING! message has failed to reach its destination. Error happened between nodes \n     ' + S + '---' +  T + '\n')
                 time.sleep(2)
@@ -188,7 +188,7 @@ def sending_message(G,paths_sorted,reliabilities_sorted):
             return True
             break
 
-    print('number of tries left : ' + str(tries) + '\n')
+    print('..........number of tries left : ' + str(tries) + '\n')
 
 
 
@@ -196,6 +196,7 @@ def sending_message(G,paths_sorted,reliabilities_sorted):
 
 #returns  TRUE or FALSE , the message did went through or did not
 def random_num(edge_rel):
+
     return random.random() < float(edge_rel)
 
 #mini simulation between comunication between two nodes
